@@ -1,0 +1,334 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Portofolio
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+
+
+
+paths:
+  /login:
+    post:
+      summary: authentication for admin
+      tags: 
+        - auth
+      description: For login and registration
+      responses:
+        '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                    $ref: '#/components/schemas/loginResponses'
+                examples:
+                  arif:
+                     $ref: '#/components/examples/loginResponses'
+               
+  
+      requestBody:
+          description: request body for logins
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginRequest'
+              examples:
+                arif:
+                  $ref: '#/components/examples/loginRequest'
+
+  /refresh_token:
+    post:
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            $ref: '#/components/schemas/Authorization'
+      security:
+        - bearerAuth: []
+      summary: authentication for admin
+      tags: 
+        - auth
+      description: For refreshing token if needed
+      responses:
+        '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                    $ref: '#/components/schemas/loginResponses'
+                examples:
+                  arif:
+                     $ref: '#/components/examples/loginResponses'
+ 
+  /get_categories:
+    get:
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum list from one responses
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: page
+          description: Now page of list
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: sort_by
+          description: Maximum list from one responses
+          schema:
+            type: string
+          required: true
+      tags: 
+      - Categories
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/basemodel'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: 
+                          type: object
+                          allOf:
+                            - $ref: '#/components/schemas/categoriesResponses'
+  /get_published_product:
+    get:
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum list from one responses
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: page
+          description: Now page of list
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: sort_by
+          description: Maximum list from one responses
+          schema:
+            type: string
+        - in: query
+          name: price_min
+          description: minimum price
+          schema:
+            type: string
+        - in: query
+          name: price_max
+          description: maximum price
+          schema:
+            type: string
+        - in: query
+          name: categories
+          description: product categories
+          schema:
+            type: string
+      tags: 
+      - Product
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/basemodel'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: 
+                          type: object
+                          allOf:
+                            - $ref: '#/components/schemas/Product'
+
+  /detail_published_product:
+    get:
+      parameters:
+        - in: path
+          name: id
+          description: Published product id
+          schema:
+            type: string
+          required: true
+      tags: 
+      - Product
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/basemodel'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        allOf:
+                          - $ref: '#/components/schemas/Product'
+                          - $ref: '#/components/schemas/ProductDetails'
+  /trx_graph:
+    get:
+      tags:
+        - Admin Dashboard
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            $ref: '#/components/schemas/Authorization'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/basemodel'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          graph:
+                            type: array
+                            items:
+                              type: object
+                              $ref: '#/components/schemas/Graph'
+
+  # /revenue_graph:
+  # /total_visitor:
+  
+
+components: 
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+
+  schemas:   
+    Authorization:
+      type: string
+
+    loginRequest:
+      type: object
+      properties: 
+        email:
+          type: string
+        password:
+          type:  string
+    loginResponses:
+      type: object
+      properties:
+        user_id: 
+          type: integer
+        token: 
+          type: string
+        expire:
+          type: string
+    basemodel: 
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+  
+    categoriesResponses:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+    
+    ProductDetails:
+      type: object
+      properties:
+        total_ratings:
+          type: string
+        ordered_count:
+          type: integer
+        descriptions:
+          type: string
+        options:
+          type: array
+          items:
+            type: object
+
+
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+          description: integer
+        price:
+          type: integer
+        price_before_discount:
+          type: integer
+        discount:
+          type: string
+        product_image:
+          type: string
+        popularity:
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+        rating:
+          type: number
+          minimum: 0.0
+          maximum: 5.0
+          description: float
+        in_stock:
+          type: boolean
+    Shipping:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: string
+    Graph:
+      type: object
+      properties:
+        x_axis:
+          type: number
+        y_axis:
+          type: number     
+  examples:
+
+    loginRequest:
+      value:
+        email: arifmaulanaa@gmail.com
+        password: aasdasdasd
+
+    loginResponses:
+      value:
+        user_id: 1
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        expire: 1594399531
+  responses:
+    404NotFound:       # Can be referenced as '#/components/responses/404NotFound'
+      description: The specified resource was not found.
+
+  
