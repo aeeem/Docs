@@ -243,6 +243,8 @@ components:
           type: string
         expire:
           type: string
+        role:
+          type: string
     basemodel: 
       type: object
       properties:
@@ -327,6 +329,7 @@ components:
         user_id: 1
         token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
         expire: 1594399531
+        role: admin
   responses:
     404NotFound:       # Can be referenced as '#/components/responses/404NotFound'
       description: The specified resource was not found.
